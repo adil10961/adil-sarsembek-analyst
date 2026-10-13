@@ -351,3 +351,271 @@
   .process-steps::before,
   :root[data-motion=on] .process-steps::after { right:auto; width:calc(80% + 16px); }
 }
+
+/* Motion composition II — expressive type, orbiting signals, and moving rhythms. */
+.hero h1 { perspective: 900px; }
+.hero h1 .motion-char {
+  display: inline-block;
+  transform-origin: 50% 88%;
+  backface-visibility: hidden;
+}
+:root[data-motion=on] .hero.motion-intro h1 .motion-char {
+  animation: name-reveal 950ms var(--motion-ease) both;
+  animation-delay: calc(var(--char-index, 0) * 35ms + 100ms);
+}
+@keyframes name-reveal {
+  from { opacity: 0; transform: translate3d(0, 100%, 0) rotateX(-65deg); }
+  70% { opacity: 1; }
+  to { opacity: 1; transform: translate3d(0, 0, 0) rotateX(0); }
+}
+.motion-heading { perspective: 800px; }
+.motion-word {
+  display: inline-block;
+  transform-origin: 0 100%;
+  backface-visibility: hidden;
+}
+:root.motion-ready[data-motion=on] .motion-heading .motion-word {
+  opacity: 0;
+  transform: translate3d(0, 32px, 0) rotateX(-35deg);
+  transition: opacity .65s var(--motion-ease), transform .85s var(--motion-ease);
+  transition-delay: calc(var(--word-index, 0) * 58ms + 80ms);
+}
+:root.motion-ready[data-motion=on] :is(.motion-heading.is-visible, .is-visible .motion-heading) .motion-word {
+  opacity: 1;
+  transform: translate3d(0, 0, 0) rotateX(0);
+}
+
+/* Fine orbital geometry frames the portrait without covering the photograph. */
+.portrait-orbit {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  color: var(--accent-ink);
+  overflow: visible;
+  fill: none;
+  z-index: 0;
+}
+.portrait-orbit .orbit-ring {
+  transform-origin: 250px 300px;
+  stroke: currentColor;
+  stroke-width: 1;
+  stroke-opacity: .32;
+}
+.portrait-orbit .orbit-ring path,
+.portrait-orbit .orbit-ring circle { vector-effect: non-scaling-stroke; }
+.portrait-orbit .ring-b { stroke: rgb(var(--motion-teal)); stroke-opacity: .36; }
+.portrait-orbit .ring-c { stroke-dasharray: 2 7; stroke-opacity: .22; }
+.portrait-orbit .orbit-satellite {
+  fill: var(--accent-ink);
+  stroke: var(--bg);
+  stroke-width: 3;
+  stroke-opacity: 1;
+}
+.portrait-orbit .ring-b .orbit-satellite { fill: rgb(var(--motion-teal)); }
+:root[data-motion=on] .portrait-orbit .orbit-ring {
+  animation: orbit-revolve 24s linear infinite;
+  animation-play-state: paused;
+}
+:root[data-motion=on] .portrait-orbit .ring-b { animation-duration: 32s; animation-direction: reverse; }
+:root[data-motion=on] .portrait-orbit .ring-c { animation-duration: 48s; }
+:root[data-motion=on] .hero-in-view .portrait-orbit .orbit-ring { animation-play-state: running; }
+@keyframes orbit-revolve { to { transform: rotate(360deg); } }
+.portrait-tags { position: absolute; inset: 0; z-index: 2; pointer-events: none; }
+.orbit-tag {
+  position: absolute;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 10px;
+  color: var(--accent-ink);
+  background: var(--surface);
+  border: 1px solid color-mix(in srgb, var(--accent-ink) 23%, var(--line));
+  border-radius: 5px;
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: .08em;
+  box-shadow: 0 5px 20px rgba(var(--motion-blue), .07);
+  line-height: 1.3;
+}
+.orbit-tag::before {
+  content: '';
+  display: block;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: currentColor;
+  box-shadow: 0 0 0 3px rgba(var(--motion-blue), .08);
+}
+.orbit-tag:nth-child(1) { left: -8px; top: 27%; }
+.orbit-tag:nth-child(2) { right: -7px; bottom: 27%; color: rgb(var(--motion-teal)); }
+.orbit-tag:nth-child(3) { left: 50%; top: 5px; }
+:root[data-motion=on] .orbit-tag { animation: tag-drift 5s ease-in-out infinite; animation-play-state: paused; }
+:root[data-motion=on] .orbit-tag:nth-child(2) { animation-delay: -1.6s; animation-duration: 6s; }
+:root[data-motion=on] .orbit-tag:nth-child(3) { animation-delay: -3s; animation-duration: 7s; }
+:root[data-motion=on] .hero-in-view .orbit-tag { animation-play-state: running; }
+@keyframes tag-drift { 0%, 100% { transform: translate3d(0, -4px, 0); } 50% { transform: translate3d(0, 5px, 0); } }
+
+/* Two different tempos create a calm, continuous editorial interlude. */
+.motion-ribbon {
+  position: relative;
+  margin-top: 8px;
+  padding-block: 21px 23px;
+  overflow: hidden;
+  border-top: 1px solid var(--line);
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+  pointer-events: none;
+}
+.ribbon-lane { overflow: hidden; line-height: 1.35; }
+.ribbon-lane + .ribbon-lane { margin-top: 11px; }
+.ribbon-track { display: flex; width: max-content; }
+.ribbon-group { display: flex; align-items: center; flex-shrink: 0; gap: 32px; padding-right: 32px; }
+.ribbon-group span { white-space: nowrap; font-size: clamp(18px, 2vw, 26px); font-weight: 500; letter-spacing: -.035em; color: var(--text); }
+.ribbon-group i { font-size: 23px; line-height: 1; color: var(--accent-ink); font-weight: 400; font-style: normal; }
+.ribbon-lane:nth-child(2) .ribbon-group { gap: 25px; padding-right: 25px; }
+.ribbon-lane:nth-child(2) .ribbon-group span { font-family: var(--mono); font-size: 10px; font-weight: 400; letter-spacing: .1em; color: var(--muted); text-transform: uppercase; }
+.ribbon-lane:nth-child(2) .ribbon-group i { font-size: 13px; color: rgb(var(--motion-teal)); }
+:root[data-motion=on] .ribbon-track { animation: ribbon-travel 26s linear infinite; animation-play-state: paused; }
+:root[data-motion=on] .ribbon-lane:nth-child(2) .ribbon-track { animation-direction: reverse; animation-duration: 34s; }
+:root[data-motion=on] .hero-in-view .ribbon-track { animation-play-state: running; }
+@keyframes ribbon-travel { to { transform: translate3d(-50%, 0, 0); } }
+
+/* Section rules draw toward the next piece of information. */
+.section-top { position: relative; }
+.section-line {
+  position: absolute;
+  left: 0;
+  bottom: -14px;
+  height: 1px;
+  width: 100%;
+  pointer-events: none;
+  background: linear-gradient(90deg, rgba(var(--motion-blue), .58), rgba(var(--motion-teal), .25) 56%, transparent);
+  transform-origin: left;
+}
+:root.motion-ready[data-motion=on] .section-line {
+  transform: scaleX(0);
+  opacity: 0;
+  transition: transform 1.4s var(--motion-ease), opacity .6s ease;
+  transition-delay: .12s;
+}
+:root.motion-ready[data-motion=on] :is(.section-top.is-visible .section-line, .is-visible .section-top .section-line, .section-line.is-visible) { transform: scaleX(1); opacity: 1; }
+
+/* A small live system visual makes stage changes tangible. */
+.stage-visual {
+  max-width: 670px;
+  margin: 15px auto 0;
+  padding-inline: 20px;
+  color: var(--accent-ink);
+  pointer-events: none;
+}
+.stage-diagram { display: block; width: 100%; height: auto; overflow: visible; fill: none; }
+.diagram-track { stroke: var(--line); stroke-width: 1.4; }
+.diagram-signal {
+  stroke: var(--accent-ink);
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-dasharray: 100;
+  stroke-dashoffset: calc(100 - var(--diagram-progress, 0) * 100);
+  transition: stroke-dashoffset .9s var(--motion-ease);
+}
+.diagram-flow { stroke: rgb(var(--motion-teal)); stroke-width: 2.5; stroke-linecap: round; stroke-dasharray: 1.2 23.8; opacity: .8; }
+.diagram-node circle { fill: var(--bg); stroke: var(--line); stroke-width: 1.2; transition: fill .5s ease, stroke .5s ease, stroke-width .5s ease; }
+.diagram-node text { fill: var(--muted); font-family: var(--mono); font-size: 11px; text-anchor: middle; dominant-baseline: central; transition: fill .4s ease; }
+.diagram-node.past circle { fill: var(--accent-soft); stroke: var(--accent-ink); }
+.diagram-node.past text { fill: var(--accent-ink); }
+.diagram-node.active circle { fill: var(--accent); stroke: var(--accent-ink); stroke-width: 2; }
+.diagram-node.active text { fill: var(--bg); }
+:root[data-motion=on] .diagram-flow { animation: diagram-transmission 4s linear infinite; animation-play-state: paused; }
+:root[data-motion=on] .diagram-node.active circle { animation: diagram-pulse 3s ease-in-out infinite; animation-play-state: paused; }
+:root[data-motion=on] .section-in-view :is(.diagram-flow, .diagram-node.active circle),
+:root[data-motion=on] .stage-visual.section-in-view :is(.diagram-flow, .diagram-node.active circle) { animation-play-state: running; }
+@keyframes diagram-transmission { to { stroke-dashoffset: -25; } }
+@keyframes diagram-pulse { 0%, 100% { stroke-width: 2; stroke-opacity: 1; } 50% { stroke-width: 9; stroke-opacity: .25; } }
+
+@media (min-width: 681px) {
+  .contact-layout > div:first-child { position: relative; isolation: isolate; }
+  .contact-layout > div:first-child::before {
+    content: '';
+    position: absolute;
+    width: 260px;
+    height: 260px;
+    top: -40px;
+    right: -15px;
+    z-index: -1;
+    border: 1px solid rgba(var(--motion-blue), .13);
+    border-radius: 50%;
+    pointer-events: none;
+    background: radial-gradient(circle, rgba(var(--motion-blue), .035), transparent 65%);
+  }
+  .contact-layout > div:first-child::after {
+    content: '';
+    position: absolute;
+    top: -40px;
+    right: 111px;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--accent-ink);
+    opacity: .5;
+    transform-origin: 2.5px 130px;
+    z-index: -1;
+    pointer-events: none;
+  }
+  :root[data-motion=on] .contact-layout > div:first-child::after { animation: orbit-revolve 28s linear infinite; animation-play-state: paused; }
+  :root[data-motion=on] .contact-section.section-in-view .contact-layout > div:first-child::after { animation-play-state: running; }
+}
+@media (max-width: 680px) {
+  :root.motion-ready[data-motion=on] .motion-heading .motion-word { transform: translate3d(0, 22px, 0); transition-delay: calc(var(--word-index, 0) * 38ms + 50ms); }
+  :root.motion-ready[data-motion=on] :is(.motion-heading.is-visible, .is-visible .motion-heading) .motion-word { transform: none; }
+  .portrait-orbit { inset: 5% 0; height: 90%; overflow: hidden; }
+  .orbit-tag { font-size: 8px; padding: 6px 8px; }
+  .orbit-tag:nth-child(1) { left: 0; }
+  .orbit-tag:nth-child(2) { right: 0; }
+  .orbit-tag:nth-child(3) { top: 0; }
+  .motion-ribbon { padding-block: 16px 19px; margin-top: 0; }
+  .ribbon-group { gap: 22px; padding-right: 22px; }
+  .ribbon-group span { font-size: 19px; }
+  .ribbon-group i { font-size: 18px; }
+  .ribbon-lane + .ribbon-lane { margin-top: 9px; }
+  .ribbon-lane:nth-child(2) .ribbon-group span { font-size: 8px; }
+  .section-line { bottom: -10px; }
+  .stage-visual { padding-inline: 0; margin-top: 8px; }
+  .diagram-node text { font-size: 13px; }
+}
+
+/* Every added component follows the existing motion preference. */
+:root[data-motion=off] :is(.portrait-orbit, .portrait-tags, .motion-ribbon, .stage-visual, .section-line) { display: none; }
+:root[data-motion=off] :is(.motion-char, .motion-word) { opacity: 1 !important; transform: none !important; }
+:root[data-motion=off] .contact-layout > div:first-child::before,
+:root[data-motion=off] .contact-layout > div:first-child::after { display: none; }
+@media (prefers-reduced-motion: reduce) {
+  :root :is(.portrait-orbit, .portrait-tags, .motion-ribbon, .stage-visual, .section-line) { display: none !important; }
+  :root :is(.motion-char, .motion-word) { opacity: 1 !important; transform: none !important; }
+  .contact-layout > div:first-child::before, .contact-layout > div:first-child::after { display: none !important; }
+}
+@media print {
+  :root :is(.portrait-orbit, .portrait-tags, .motion-ribbon, .stage-visual, .section-line) { display: none !important; }
+  :root :is(.motion-char, .motion-word) { opacity: 1 !important; transform: none !important; }
+  .hero h1 .motion-char::before { content: none !important; }
+  .contact-layout > div:first-child::before, .contact-layout > div:first-child::after { display: none !important; }
+}
+
+/* The name keeps its original two-color hierarchy after it is split. */
+:root .hero h1 > .motion-first-name,
+:root .hero h1 > .motion-first-name > .motion-char {
+  color: var(--text);
+  background: none;
+  -webkit-text-fill-color: currentColor;
+}
+:root[data-motion=on] .motion-hero h1 > .motion-first-name { animation: none; background:none!important; -webkit-text-fill-color:currentColor; }
+:root .hero h1 > .motion-last-name > .motion-char {
+  color: var(--accent-ink);
+  -webkit-text-fill-color: currentColor;
+}
+@media print { .hero h1 > .motion-first-name::before { content: none !important; } }
+.ribbon-group { min-width: 100vw; }
+
+.portrait-orbit .orbit-ring > path { stroke-opacity:.78; stroke-width:1.5; }
+.ribbon-group { justify-content:space-around; }
