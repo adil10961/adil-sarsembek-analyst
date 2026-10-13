@@ -1,0 +1,353 @@
+/* Motion layer: native scrolling, composited movement, and progressive enhancement. */
+:root {
+  --motion-ease: cubic-bezier(.16, 1, .3, 1);
+  --motion-ease-soft: cubic-bezier(.22, .61, .36, 1);
+  --motion-blue: 49, 94, 251;
+  --motion-teal: 22, 116, 107;
+}
+:root[data-theme=dark] { --motion-blue: 138, 169, 255; --motion-teal: 118, 203, 190; }
+
+/* Content always remains available before the enhancement has mounted. */
+:root.motion-ready[data-motion=on] .motion-reveal {
+  opacity: 0;
+  transform: translate3d(0, 30px, 0);
+  filter: blur(4px);
+  transition: opacity .85s var(--motion-ease), transform 1s var(--motion-ease), filter .8s var(--motion-ease);
+  transition-delay: var(--reveal-delay, 0ms);
+}
+:root.motion-ready[data-motion=on] .motion-reveal.is-visible {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+  filter: blur(0);
+}
+:root.motion-ready .hero-copy > h1,
+:root.motion-ready .hero-role,
+:root.motion-ready .hero-tagline,
+:root.motion-ready .hero-intro,
+:root.motion-ready .hero-actions { animation: none; }
+
+/* An understated animated system diagram behind the introduction. */
+.motion-hero { position: relative; isolation: isolate; }
+.motion-field {
+  position: absolute;
+  inset: 0 -22px;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+  contain: paint;
+  opacity: .82;
+  -webkit-mask-image: linear-gradient(transparent, #000 14%, #000 80%, transparent);
+  mask-image: linear-gradient(transparent, #000 14%, #000 80%, transparent);
+}
+.motion-orb {
+  position: absolute;
+  width: min(60vw, 630px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(var(--motion-blue), .075), rgba(var(--motion-blue), .025) 44%, transparent 70%);
+  right: -8%;
+  top: -13%;
+}
+.motion-orb:nth-child(2) {
+  width: min(46vw, 500px);
+  top: 39%;
+  right: 20%;
+  background: radial-gradient(circle, rgba(var(--motion-teal), .052), transparent 70%);
+}
+.motion-grid {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  fill: none;
+  color: var(--accent-ink);
+  opacity: .6;
+}
+.motion-grid path { stroke: currentColor; stroke-width: .7; stroke-opacity: .12; vector-effect: non-scaling-stroke; }
+.motion-grid .flow-trace {
+  stroke-width: 1.3;
+  stroke-opacity: .48;
+  stroke-dasharray: 5 120;
+  stroke-linecap: round;
+}
+.motion-grid .flow-node { fill: var(--bg); stroke: currentColor; stroke-opacity: .22; stroke-width: 1; }
+:root[data-motion=on] .motion-orb { animation: ambient-drift 16s ease-in-out infinite alternate; }
+:root[data-motion=on] .motion-orb:nth-child(2) { animation-duration: 21s; animation-delay: -7s; animation-direction: alternate-reverse; }
+:root[data-motion=on] .flow-trace { animation: signal-travel 11s linear infinite; }
+:root[data-motion=on] .flow-trace:nth-child(2n) { animation-duration: 14s; animation-delay: -6s; }
+:root[data-motion=on] .flow-trace:nth-child(3n) { animation-delay: -3s; }
+:root[data-motion=on] .flow-node { animation: signal-node 7s ease-in-out infinite; }
+:root[data-motion=on] .flow-node:nth-child(2n) { animation-delay: -3.5s; }
+:root[data-motion=on] .motion-hero .motion-field * { animation-play-state: paused; }
+:root[data-motion=on] .motion-hero.hero-in-view .motion-field * { animation-play-state: running; }
+@keyframes ambient-drift {
+  from { transform: translate3d(-3%, -3%, 0) scale(.94); }
+  to { transform: translate3d(7%, 6%, 0) scale(1.07); }
+}
+@keyframes signal-travel { from { stroke-dashoffset: 125; } to { stroke-dashoffset: 0; } }
+@keyframes signal-node { 0%, 36%, 65%, 100% { stroke-opacity: .22; } 48% { stroke-opacity: .85; } }
+
+/* Portrait layers respond independently, so text and controls stay steady. */
+:root[data-motion=on] .portrait-composition { perspective: 1100px; }
+:root[data-motion=on] .portrait-frame {
+  transform: translate3d(0, var(--parallax-y, 0px), 0) rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg));
+  transition: transform .7s var(--motion-ease-soft), box-shadow .7s var(--motion-ease-soft);
+  transform-origin: 50% 50%;
+  backface-visibility: hidden;
+}
+:root[data-motion=on] .portrait-composition.pointer-active .portrait-frame {
+  box-shadow: 0 24px 56px rgba(var(--motion-blue), .11), 0 5px 15px #17223308;
+}
+:root[data-motion=on] .connection-art { transition: opacity .6s ease; }
+:root[data-motion=on] .motion-hero .connection-art path:first-child {
+  stroke-dasharray: 2200;
+  stroke-dashoffset: 2200;
+  animation: circuit-draw 2.8s var(--motion-ease-soft) .35s forwards;
+}
+:root[data-motion=on] .motion-hero .connection-art circle {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: circuit-node-in 1s var(--motion-ease) 1.2s both;
+}
+:root[data-motion=on] .motion-hero .connection-art circle:nth-last-child(2) { animation-delay: 1.55s; }
+:root[data-motion=on] .motion-hero .connection-art circle:last-child { animation-delay: 1.9s; }
+@keyframes circuit-draw { to { stroke-dashoffset: 0; } }
+@keyframes circuit-node-in { from { opacity: 0; transform: scale(.1); } to { opacity: 1; transform: scale(1); } }
+
+/* A slow chromatic shift keeps the name crisp, in both themes. */
+@supports (-webkit-background-clip: text) {
+  :root[data-motion=on] .motion-hero h1 > span {
+    background: linear-gradient(105deg, #2b56ec 4%, #266298 34%, #315efb 63%, #2b56ec 94%);
+    background-size: 230% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: name-light 15s ease-in-out infinite alternate;
+    animation-play-state: paused;
+  }
+  :root[data-theme=dark][data-motion=on] .motion-hero h1 > span {
+    background-image: linear-gradient(105deg, #8aa9ff 4%, #8acbc8 34%, #a6bbff 63%, #8aa9ff 94%);
+  }
+  :root[data-motion=on] .motion-hero.hero-in-view h1 > span { animation-play-state: running; }
+}
+@keyframes name-light { from { background-position: 0% 50%; } to { background-position: 100% 50%; } }
+:root[data-motion=on] .status-dot { box-shadow: 0 0 0 4px rgba(var(--motion-teal), .07); }
+:root[data-motion=on] .hero-in-view .status-dot { animation: status-breathe 5s ease-out infinite; }
+@keyframes status-breathe {
+  0%, 68%, 100% { box-shadow: 0 0 0 4px rgba(var(--motion-teal), .07); }
+  35% { box-shadow: 0 0 0 8px rgba(var(--motion-teal), 0); }
+}
+
+/* The header settles into a translucent surface as the page moves. */
+:root[data-motion=on] .header {
+  transition: background .5s ease, box-shadow .5s ease, border-color .5s ease, backdrop-filter .5s ease;
+}
+.header.is-scrolled {
+  background: color-mix(in srgb, var(--bg) 91%, transparent);
+  -webkit-backdrop-filter: blur(18px);
+  backdrop-filter: blur(18px);
+  box-shadow: 0 6px 28px #17223307;
+  border-color: color-mix(in srgb, var(--line) 80%, transparent);
+}
+:root[data-theme=dark] .header.is-scrolled { box-shadow: 0 6px 28px #00000020; }
+:root[data-motion=on] #navigation a { transition: color .3s ease; }
+@media (min-width: 681px) {
+  :root[data-motion=on] #navigation a::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 9px;
+    height: 1px;
+    background: var(--accent-ink);
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform .45s var(--motion-ease);
+  }
+  :root[data-motion=on] #navigation a:hover::before,
+  :root[data-motion=on] #navigation a:focus-visible::before { transform: scaleX(1); transform-origin: left; }
+  :root[data-motion=on] #navigation a.active::after { animation: nav-marker-in .5s var(--motion-ease) both; }
+}
+@keyframes nav-marker-in { from { opacity: 0; scale: .3; } to { opacity: 1; scale: 1; } }
+
+/* Pointer light is purely decorative and never captures a click. */
+:root[data-motion=on] :is(.skill-card, .university, .project, .hack, .languages) {
+  position: relative;
+  isolation: isolate;
+  transition: border-color .45s ease, box-shadow .6s var(--motion-ease), transform .75s var(--motion-ease), opacity .85s var(--motion-ease), filter .8s var(--motion-ease);
+}
+:root[data-motion=on] :is(.skill-card, .university, .project, .hack, .languages)::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: radial-gradient(380px circle at var(--pointer-x, 50%) var(--pointer-y, 40%), rgba(var(--motion-blue), .065), transparent 70%);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .55s ease;
+}
+:root[data-motion=on] .button {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  transform: translate3d(var(--magnet-x, 0px), var(--magnet-y, 0px), 0);
+  transition: transform .65s var(--motion-ease), background .35s ease, border-color .35s ease, box-shadow .5s ease;
+}
+:root[data-motion=on] .button::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: radial-gradient(160px circle at var(--pointer-x, 50%) var(--pointer-y, 50%), #ffffff30, transparent 75%);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .4s ease;
+}
+:root[data-motion=on] .button.secondary::before { background: radial-gradient(160px circle at var(--pointer-x, 50%) var(--pointer-y, 50%), rgba(var(--motion-blue), .075), transparent 75%); }
+:root[data-motion=on] :is(.button, .text-link, .contact-github, .utility-actions a, .utility-actions button) svg,
+:root[data-motion=on] .text-link > span { transition: transform .55s var(--motion-ease); }
+:root[data-motion=on] .icon-button { transition: color .25s ease, border-color .3s ease, background .3s ease, transform .5s var(--motion-ease); }
+:root[data-motion=on] .icon-button svg { transition: transform .6s var(--motion-ease); }
+:root[data-motion=on] .tags span { transition: color .3s ease, border-color .3s ease, background .3s ease, transform .5s var(--motion-ease); }
+:root[data-motion=on] .course { position: relative; transition: background .5s ease, padding .5s var(--motion-ease); }
+:root[data-motion=on] .course::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: -1px;
+  right: 0;
+  height: 1px;
+  background: var(--accent-ink);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform .7s var(--motion-ease);
+  pointer-events: none;
+}
+:root[data-motion=on] .course-star { transition: transform .7s var(--motion-ease); }
+:root[data-motion=on] .contact-line a { transition: color .3s ease; }
+:root[data-motion=on] .contact-line { transition: border-color .45s ease; }
+
+@media (hover: hover) and (pointer: fine) {
+  :root[data-motion=on] :is(.skill-card, .university, .project, .hack, .languages).pointer-active::before { opacity: 1; }
+  :root[data-motion=on] :is(.skill-card, .university, .hack).pointer-active {
+    border-color: rgba(var(--motion-blue), .35);
+    box-shadow: 0 14px 36px rgba(var(--motion-blue), .065);
+  }
+  :root.motion-ready[data-motion=on] :is(.skill-card, .university, .hack).motion-reveal.is-visible.pointer-active { transform: translate3d(0, -4px, 0); transition-delay: 0ms; }
+  :root[data-motion=on] .button.pointer-active::before { opacity: 1; }
+  :root[data-motion=on] .button.primary.pointer-active { box-shadow: 0 9px 25px rgba(49, 94, 251, .22); }
+  :root[data-motion=on] .button:hover svg { transform: translate(2px, -2px); }
+  :root[data-motion=on] .button[download]:hover svg { transform: translateY(3px); }
+  :root[data-motion=on] .text-link:hover > span { transform: translateY(4px); }
+  :root[data-motion=on] .contact-github:hover svg { transform: translate(2px, -2px); }
+  :root[data-motion=on] .utility-actions :is(a, button):hover svg { transform: translateY(-2px); }
+  :root[data-motion=on] .icon-button:hover { transform: translateY(-2px); }
+  :root[data-motion=on] #settings-toggle:hover svg { transform: rotate(35deg); }
+  :root[data-motion=on] .tags span:hover { color: var(--accent-ink); border-color: rgba(var(--motion-blue), .38); background: var(--accent-soft); transform: translateY(-2px); }
+  :root[data-motion=on] .course:hover { background: rgba(var(--motion-blue), .025); }
+  :root[data-motion=on] .course:hover::after { transform: scaleX(1); }
+  :root[data-motion=on] .course:hover .course-star { transform: rotate(90deg); }
+  :root[data-motion=on] .contact-line:hover { border-color: rgba(var(--motion-blue), .45); }
+}
+:root[data-motion=on] .button:active,
+:root[data-motion=on] .icon-button:active { scale: .975; transition-duration: .14s; }
+
+/* Small interactions share the same rhythm as the page entrance. */
+:root[data-motion=on] .timeline-node { transition: background .45s ease, box-shadow .6s ease, border-color .45s ease; }
+:root[data-motion=on] .job.is-passed .timeline-node { background: var(--accent); }
+:root[data-motion=on] .job.is-active .timeline-node { background: var(--accent); box-shadow: 0 0 0 5px rgba(var(--motion-blue), .1), 0 0 0 10px rgba(var(--motion-blue), .035); }
+:root[data-motion=on] .job-org { transition: color .4s ease; }
+:root[data-motion=on] .job.is-active .job-org { color: var(--accent-ink); }
+/* The accent track follows the selected stage without moving its labels. */
+:root[data-motion=on] .process-steps::after {
+  content: '';
+  position: absolute;
+  left: 26px;
+  right: 26px;
+  top: 25px;
+  height: 1px;
+  background: var(--accent);
+  transform: scaleX(var(--step-progress, 0));
+  transform-origin: left;
+  transition: transform .85s var(--motion-ease);
+  pointer-events: none;
+  z-index: 0;
+}
+:root[data-motion=on] .process-step { z-index: 1; }
+:root[data-motion=on] .step-node { transition: color .35s ease, background .4s ease, border-color .35s ease, box-shadow .55s ease, transform .6s var(--motion-ease); }
+:root[data-motion=on] .process-step.selected .step-node { box-shadow: 0 0 0 5px rgba(var(--motion-blue), .08); }
+:root[data-motion=on] .process-step:hover .step-node { transform: translateY(-2px); }
+:root[data-motion=on] .filter { transition: background .3s ease, color .3s ease, border-color .3s ease, box-shadow .4s ease; }
+:root[data-motion=on] .filter.active { box-shadow: 0 2px 12px rgba(var(--motion-blue), .08); }
+:root[data-motion=on] .search-box { transition: border-color .3s ease, box-shadow .4s ease; }
+:root[data-motion=on] .search-box:focus-within { box-shadow: 0 0 0 4px rgba(var(--motion-blue), .07); }
+:root[data-motion=on] .plus { transition: transform .6s var(--motion-ease); }
+:root[data-motion=on] .skill-details[open] .details-body { animation: details-unfold .55s var(--motion-ease) both; }
+:root[data-motion=on] .settings-panel:not([hidden]) { animation: panel-enter .4s var(--motion-ease) both; transform-origin: top right; }
+:root[data-motion=on] dialog[open] { animation: dialog-enter .45s var(--motion-ease) both; }
+:root[data-motion=on] dialog[open]::backdrop { animation: backdrop-enter .35s ease both; }
+:root[data-motion=on] .toast { transition: opacity .35s ease, transform .55s var(--motion-ease); }
+@keyframes details-unfold { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
+@keyframes panel-enter { from { opacity: 0; transform: translateY(-8px) scale(.98); } to { opacity: 1; transform: none; } }
+@keyframes dialog-enter { from { opacity: 0; transform: translateY(18px) scale(.97); } to { opacity: 1; transform: none; } }
+@keyframes backdrop-enter { from { opacity: 0; } to { opacity: 1; } }
+
+@media (max-width: 680px) {
+  .motion-field { inset-inline: -10px; opacity: .6; }
+  :root[data-motion=on] .process-steps::after {
+    left: 20px;
+    right: auto;
+    top: 20px;
+    bottom: 20px;
+    width: 1px;
+    height: auto;
+    transform: scaleY(var(--step-progress, 0));
+    transform-origin: top;
+  }
+  .motion-orb { width: 480px; top: 27%; right: -200px; }
+  .motion-orb:nth-child(2) { width: 340px; top: 66%; right: -70px; }
+  .motion-grid { opacity: .42; }
+  :root.motion-ready[data-motion=on] .motion-reveal { transform: translate3d(0, 20px, 0); filter: none; transition-duration: .75s, .85s, .7s; }
+  :root.motion-ready[data-motion=on] .motion-reveal.is-visible { transform: translate3d(0, 0, 0); }
+  :root[data-motion=on] #navigation.open { animation: menu-enter .45s var(--motion-ease) both; transform-origin: top; }
+  :root[data-motion=on] #navigation.open a { animation: menu-link-enter .5s var(--motion-ease) both; }
+  :root[data-motion=on] #navigation.open a:nth-child(2) { animation-delay: 30ms; }
+  :root[data-motion=on] #navigation.open a:nth-child(3) { animation-delay: 60ms; }
+  :root[data-motion=on] #navigation.open a:nth-child(4) { animation-delay: 90ms; }
+  :root[data-motion=on] #navigation.open a:nth-child(5) { animation-delay: 120ms; }
+  :root[data-motion=on] #navigation.open a:nth-child(6) { animation-delay: 150ms; }
+  :root[data-motion=on] #navigation.open a:nth-child(7) { animation-delay: 180ms; }
+  :root[data-motion=on] .mobile-dock { -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); background: color-mix(in srgb, var(--surface) 94%, transparent); }
+}
+@keyframes menu-enter { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: none; } }
+@keyframes menu-link-enter { from { opacity: 0; transform: translateX(-8px); } to { opacity: 1; transform: none; } }
+
+/* User preference and OS preference take precedence over every effect. */
+:root[data-motion=off] .motion-field { display: none; }
+:root[data-motion=off] .motion-reveal { opacity: 1 !important; transform: none !important; filter: none !important; }
+:root[data-motion=off] .portrait-frame,
+:root[data-motion=off] .button { transform: none !important; }
+:root[data-motion=off] .motion-hero h1 > span { background: none; -webkit-text-fill-color: currentColor; }
+:root[data-motion=off] .connection-art path:first-child { stroke-dasharray: none; stroke-dashoffset: 0; }
+:root[data-motion=off] .connection-art circle { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) {
+  .motion-field { display: none !important; }
+  :root .motion-reveal { opacity: 1 !important; transform: none !important; filter: none !important; }
+  :root .portrait-frame, :root .button, :root .step-node { transform: none !important; }
+  :root .motion-hero h1 > span { background: none !important; -webkit-text-fill-color: currentColor !important; }
+  :root .connection-art path:first-child { stroke-dasharray: none !important; stroke-dashoffset: 0 !important; }
+  :root .connection-art circle { opacity: 1 !important; transform: none !important; }
+}
+@media print {
+  .motion-field { display: none !important; }
+  :root .motion-reveal { opacity: 1 !important; transform: none !important; filter: none !important; }
+  :root .portrait-frame, :root .button { transform: none !important; }
+  :root .motion-hero h1 > span { background: none !important; -webkit-text-fill-color: currentColor !important; }
+}
+
+/* Match the connector precisely to the five stage-node centers. */
+@media (min-width:681px) {
+  .process-steps::before,
+  :root[data-motion=on] .process-steps::after { right:auto; width:calc(80% + 16px); }
+}
